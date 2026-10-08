@@ -88,7 +88,7 @@
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3A5 5 0 0 0 13.5 3.5L12 5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3A5 5 0 0 0 10.5 20.5L12 19"/></svg>
     复制链接
   </button>
-  <p class="hint">把同一条链接发到群里，每人点自己的组，只看得到自己那一组。</p>
+  <p class="hint" id="hint"></p>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -100,6 +100,7 @@
   var $ = function(id){ return document.getElementById(id); };
   var picksEl = $('picks'), ph = $('ph'), shown = $('shown');
   var numEl = $('num'), whoEl = $('who'), shareBtn = $('share'), toastEl = $('toast');
+  var hintEl = $('hint');
   var map = null, picked = 0;
 
   /* ---------- SHA-256（纯 JS，保证任何设备算出的结果一致） ---------- */
@@ -226,8 +227,9 @@
   }
 
   function start(){
-    var seed = seedFromUrl() || makeSeed();
-    if (!seedFromUrl()) putSeedInUrl(seed);
+    var seedInUrl = seedFromUrl();
+    var seed = seedInUrl || makeSeed();
+    if (!seedInUrl) putSeedInUrl(seed);
     map = buildMap(seed);
     picked = 0;
     numEl.innerHTML = '-<small>号</small>';
@@ -235,6 +237,9 @@
     shown.classList.add('hidden');
     ph.classList.remove('hidden');
     picksEl.classList.remove('hidden');
+    hintEl.textContent = seedInUrl
+      ? '把同一条链接发到群里，每人点自己的组，只看得到自己那一组。'
+      : '顺序已确定。请点上面的「复制链接」再转发，直接发这个网址会变成另一场抽签。';
   }
 
   function copy(text, okMsg){
