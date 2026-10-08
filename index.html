@@ -24,32 +24,65 @@
     font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
     -webkit-font-smoothing:antialiased;
   }
+  .wrap{max-width:480px;margin:0 auto;padding:20px 16px 44px}
+  h1{margin:0 0 10px;font-size:19px;font-weight:600;color:var(--ink-2)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;padding:16px}
 
-  /* ---------- 参与者：只有一个号码 ---------- */
-  #viewer{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-  #viewer .num{font-size:88px;line-height:1;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-2px}
-  #viewer .num small{font-size:26px;font-weight:600;color:var(--ink-2);margin-left:10px;letter-spacing:0}
-  #viewer .who{margin-top:14px;font-size:17px;font-weight:600}
-  #viewer .bad{font-size:16px;color:var(--ink-2);text-align:center}
-
-  /* ---------- 组织者：只有他能看到对照表 ---------- */
-  .wrap{max-width:560px;margin:0 auto;padding:24px 16px 48px}
-  h1{margin:0 0 6px;font-size:20px}
-  .sub{margin:0 0 16px;font-size:12.5px;color:var(--ink-3)}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:6px 14px;box-shadow:var(--shadow)}
-  .row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
-  .row:last-child{border-bottom:0}
-  .row .lab{flex:0 0 auto;width:66px;font-size:14px;color:var(--ink-2)}
-  .row .val{flex:1;min-width:0;font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-  .row button{
-    flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
-    padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;
-    color:var(--ink);font:13px inherit;cursor:pointer;
+  /* 转盘 */
+  /* 转盘是圆的，旋转时只有四个透明的角会探出去；裁掉它们，避免页面出现横向滚动 */
+  .stage{position:relative;padding:16px 0 6px;overflow:hidden}
+  .pointer{
+    position:absolute;left:50%;top:4px;transform:translateX(-50%);
+    width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;
+    border-top:19px solid var(--ink);z-index:2;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2));
+    pointer-events:none;
   }
-  .row button:hover{border-color:var(--accent);color:var(--accent)}
-  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .hint{font-size:12.5px;color:var(--ink-3);margin:14px 0 0;line-height:1.7}
-  .hint b{color:var(--ink-2);font-weight:600}
+  #wheel{
+    display:block;width:100%;max-width:272px;margin:0 auto;transform-origin:50% 50%;
+    will-change:transform;
+    pointer-events:none;   /* 旋转后的转盘不能挡住下面的输入框和按钮 */
+  }
+  #wheel text{font-weight:800;font-size:30px;fill:#fff;paint-order:stroke}
+
+  .enter{display:flex;gap:9px;margin-top:6px}
+  #g{
+    flex:0 0 92px;padding:13px 10px;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--panel);color:var(--ink);font:20px inherit;font-weight:700;text-align:center;
+    font-variant-numeric:tabular-nums;
+  }
+  #go{
+    flex:1;padding:13px 16px;border:1px solid var(--accent);border-radius:var(--radius);
+    background:var(--accent);color:var(--accent-ink);font:15px inherit;font-weight:600;cursor:pointer;
+  }
+  #go:hover:not(:disabled){filter:brightness(1.06)}
+  #go:disabled{opacity:.55;cursor:not-allowed}
+  #g:disabled{opacity:.55}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .readout{text-align:center;min-height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:12px}
+  .readout .idle{color:var(--ink-3);font-size:14px}
+  .readout .num{font-size:52px;line-height:1;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-1px}
+  .readout .num small{font-size:18px;font-weight:600;color:var(--ink-2);margin-left:7px;letter-spacing:0}
+  .readout .who{margin-top:5px;font-size:15px;font-weight:600}
+
+  h2{margin:0 0 9px;font-size:12.5px;color:var(--ink-2);font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  h2 span{font-size:12px;color:var(--ink-3);font-weight:400}
+  .pills{display:flex;flex-wrap:wrap;gap:7px}
+  .pill{
+    display:inline-flex;align-items:center;padding:4px 11px;border-radius:999px;
+    background:var(--accent-soft);color:var(--accent);font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;
+  }
+  .empty{color:var(--ink-3);font-size:13px}
+  table{width:100%;border-collapse:collapse}
+  td{padding:10px 2px;border-bottom:1px solid var(--line);font-size:15px}
+  tr:last-child td{border-bottom:0}
+  td.n{text-align:right;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  .final{border-color:var(--accent)}
+  .reset{
+    display:block;width:100%;padding:10px 16px;border:1px solid var(--line);border-radius:var(--radius);
+    background:transparent;color:var(--ink-3);font:13px inherit;cursor:pointer;
+  }
+  .reset:hover{color:var(--ink);border-color:var(--ink-3)}
   .toast{
     position:fixed;left:50%;bottom:24px;transform:translate(-50%,14px);background:var(--ink);
     color:var(--bg);padding:9px 16px;border-radius:6px;font-size:13px;opacity:0;
@@ -57,28 +90,54 @@
   }
   .toast.on{opacity:.95;transform:translate(-50%,0)}
   .hidden{display:none!important}
+  @media (prefers-reduced-motion: reduce){ #wheel{transition-duration:.6s!important} }
 </style>
 </head>
 <body>
-
-<!-- 参与者视角：链接里只带自己的组号和号码，页面里没有任何其他组的信息 -->
-<div id="viewer" class="hidden">
-  <div class="num" id="vnum"></div>
-  <div class="who" id="vwho"></div>
-  <div class="bad hidden" id="vbad">链接不完整，请找抽签的人重新要一条链接。</div>
-</div>
-
-<!-- 组织者视角：只有带种子的链接才会看到这一屏 -->
-<div class="wrap hidden" id="admin">
+<div class="wrap">
   <h1>分组抽签</h1>
-  <p class="sub">每组发自己那一条链接，别发在所有人都在的群里。</p>
-  <div class="panel" id="rows"></div>
-  <p class="hint">
-    每条链接里只有<b>那一组自己的号码</b>，没有抽签种子，所以别人拿到也只能看到自己那一组，点来点去也看不到其他组。
-    这一屏（网址里带 <b>#s=</b> 的）<b>只有你一个人有，不要转发</b>。
-  </p>
-</div>
 
+  <section class="panel">
+    <div class="stage">
+      <div class="pointer"></div>
+      <svg id="wheel" viewBox="0 0 260 260" role="img" aria-label="抽签转盘">
+        <g id="sectors"></g>
+        <circle cx="130" cy="130" r="21" fill="#ffffff" stroke="rgba(0,0,0,.12)"/>
+        <circle cx="130" cy="130" r="6" fill="#5b6469"/>
+      </svg>
+    </div>
+
+    <div class="enter">
+      <input type="number" id="g" min="1" max="4" step="1" inputmode="numeric" autocomplete="off" placeholder="组号">
+      <button id="go" type="button">开始转</button>
+    </div>
+
+    <div class="readout">
+      <div class="idle" id="idle">输入你是第几组，然后开始转</div>
+      <div class="hidden" id="shown">
+        <div class="num" id="num">-<small>号</small></div>
+        <div class="who" id="who"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>还没被抽走的号码 <span id="poolCount"></span></h2>
+    <div class="pills" id="pool"></div>
+  </section>
+
+  <section class="panel">
+    <h2>已经抽过的组 <span id="drawnCount"></span></h2>
+    <div class="pills" id="drawn"></div>
+  </section>
+
+  <section class="panel final hidden" id="finalPanel">
+    <h2>四组抽完，公布顺序</h2>
+    <table><tbody id="finalBody"></tbody></table>
+  </section>
+
+  <button class="reset" id="reset" type="button">重新抽签</button>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -86,211 +145,236 @@
   'use strict';
 
   var GROUPS = 4;
+  var KEY = 'group-wheel-v1';
+  var COLORS = ['#0d9488', '#2563eb', '#d97706', '#e11d48'];
+  var SPIN_MS = 4000;
   var $ = function(id){ return document.getElementById(id); };
-  var viewerEl = $('viewer'), vnumEl = $('vnum'), vwhoEl = $('vwho'), vbadEl = $('vbad');
-  var adminEl = $('admin'), rowsEl = $('rows'), toastEl = $('toast');
+  var sectorsEl = $('sectors'), wheelEl = $('wheel');
+  var gEl = $('g'), goEl = $('go'), idleEl = $('idle'), shownEl = $('shown');
+  var numEl = $('num'), whoEl = $('who');
+  var poolEl = $('pool'), poolCount = $('poolCount');
+  var drawnEl = $('drawn'), drawnCount = $('drawnCount');
+  var finalPanel = $('finalPanel'), finalBody = $('finalBody');
+  var resetEl = $('reset'), toastEl = $('toast');
 
-  /* ---------- SHA-256（纯 JS，任何设备结果一致） ---------- */
-  var K = [
-    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
-    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
-    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
-    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
-    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
-    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
-    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
-    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
-  ];
+  var st = load();
+  var resultTimer = null, spinning = false;
 
-  function utf8Bytes(str){
-    var out = [];
-    for (var i = 0; i < str.length; i++){
-      var c = str.charCodeAt(i);
-      if (c < 0x80){ out.push(c); }
-      else if (c < 0x800){ out.push(0xc0 | (c >> 6), 0x80 | (c & 63)); }
-      else if (c >= 0xd800 && c <= 0xdbff){
-        var c2 = i + 1 < str.length ? str.charCodeAt(i + 1) : 0;
-        if (c2 >= 0xdc00 && c2 <= 0xdfff){
-          var cp = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
-          out.push(0xf0 | (cp >> 18), 0x80 | ((cp >> 12) & 63), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63));
-          i++;
-        } else { out.push(0xef, 0xbf, 0xbd); }
+  function blank(){
+    var pool = [];
+    for (var i = 1; i <= GROUPS; i++) pool.push(i);
+    return { pool: pool, res: {} };
+  }
+  function load(){
+    try {
+      var o = JSON.parse(localStorage.getItem(KEY));
+      if (o && Array.isArray(o.pool) && o.res && typeof o.res === 'object'){
+        var res = {}, used = [];
+        for (var k in o.res){
+          var g = parseInt(k, 10), n = parseInt(o.res[k], 10);
+          if (g >= 1 && g <= GROUPS && n >= 1 && n <= GROUPS && used.indexOf(n) < 0){ res[g] = n; used.push(n); }
+        }
+        var pool = [];
+        for (var i = 1; i <= GROUPS; i++) if (used.indexOf(i) < 0) pool.push(i);
+        return { pool: pool, res: res };
       }
-      else if (c >= 0xdc00 && c <= 0xdfff){ out.push(0xef, 0xbf, 0xbd); }
-      else { out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63)); }
+    } catch (e) {}
+    return blank();
+  }
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {}
+  }
+
+  function randIndex(max){
+    if (window.crypto && crypto.getRandomValues){
+      var limit = Math.floor(4294967296 / max) * max;
+      var buf = new Uint32Array(1), v;
+      do { crypto.getRandomValues(buf); v = buf[0]; } while (v >= limit);
+      return v % max;
     }
-    return out;
+    return Math.floor(Math.random() * max);
   }
-  function rotr(x, n){ return (x >>> n) | (x << (32 - n)); }
-  function toHex8(n){ return ('00000000' + (n >>> 0).toString(16)).slice(-8); }
-
-  function sha256Hex(str){
-    var bytes = utf8Bytes(str), len = bytes.length;
-    var lo = (len * 8) >>> 0, hi = Math.floor(len / 536870912);
-    var total = Math.ceil((len + 9) / 64) * 64;
-    var b = new Uint8Array(total);
-    b.set(bytes);
-    b[len] = 0x80;
-    b[total-8] = (hi >>> 24) & 255; b[total-7] = (hi >>> 16) & 255;
-    b[total-6] = (hi >>> 8) & 255;  b[total-5] = hi & 255;
-    b[total-4] = (lo >>> 24) & 255; b[total-3] = (lo >>> 16) & 255;
-    b[total-2] = (lo >>> 8) & 255;  b[total-1] = lo & 255;
-
-    var H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
-    var w = new Uint32Array(64);
-    for (var off = 0; off < total; off += 64){
-      var i;
-      for (i = 0; i < 16; i++){
-        w[i] = ((b[off + i*4] << 24) | (b[off + i*4 + 1] << 16) | (b[off + i*4 + 2] << 8) | b[off + i*4 + 3]) >>> 0;
-      }
-      for (i = 16; i < 64; i++){
-        var s0 = rotr(w[i-15], 7) ^ rotr(w[i-15], 18) ^ (w[i-15] >>> 3);
-        var s1 = rotr(w[i-2], 17) ^ rotr(w[i-2], 19) ^ (w[i-2] >>> 10);
-        w[i] = (w[i-16] + s0 + w[i-7] + s1) >>> 0;
-      }
-      var a=H[0], bb=H[1], c=H[2], d=H[3], e=H[4], f=H[5], g=H[6], h=H[7];
-      for (i = 0; i < 64; i++){
-        var S1 = rotr(e,6) ^ rotr(e,11) ^ rotr(e,25);
-        var ch = (e & f) ^ (~e & g);
-        var t1 = (h + S1 + ch + K[i] + w[i]) >>> 0;
-        var S0 = rotr(a,2) ^ rotr(a,13) ^ rotr(a,22);
-        var maj = (a & bb) ^ (a & c) ^ (bb & c);
-        var t2 = (S0 + maj) >>> 0;
-        h=g; g=f; f=e; e=(d + t1) >>> 0; d=c; c=bb; bb=a; a=(t1 + t2) >>> 0;
-      }
-      H[0]=(H[0]+a)>>>0;  H[1]=(H[1]+bb)>>>0; H[2]=(H[2]+c)>>>0;  H[3]=(H[3]+d)>>>0;
-      H[4]=(H[4]+e)>>>0;  H[5]=(H[5]+f)>>>0;  H[6]=(H[6]+g)>>>0;  H[7]=(H[7]+h)>>>0;
-    }
-    return H.map(toHex8).join('');
-  }
-
-  /* ---------- 号码：排名即号码，四组天然不重复 ---------- */
-  function buildMap(seed){
-    var rows = [];
-    for (var g = 1; g <= GROUPS; g++) rows.push({ g: g, sig: sha256Hex(seed + '\n#group:' + g) });
-    rows.sort(function(x, y){
-      if (x.sig < y.sig) return -1;
-      if (x.sig > y.sig) return 1;
-      return x.g - y.g;
-    });
-    var out = {};
-    rows.forEach(function(r, i){ out[r.g] = i + 1; });
-    return out;
-  }
-  function makeSeed(){
-    var buf = new Uint32Array(4);
-    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(buf);
-    else for (var i = 0; i < 4; i++) buf[i] = Math.floor(Math.random() * 4294967296);
-    return Array.prototype.map.call(buf, function(n){
-      return ('00000000' + (n >>> 0).toString(16)).slice(-8);
-    }).join('');
-  }
-
-  /* ---------- 网址参数 ---------- */
-  function hash(){
-    return (location.hash || '').replace(/^#/, '');
-  }
-  function param(name){
-    var m = hash().match(new RegExp('(?:^|&)' + name + '=([^&]*)'));
-    return m ? decodeURIComponent(m[1]) : '';
-  }
-  function baseUrl(){
-    return location.href.split('#')[0];
-  }
-  function seedFromUrl(){
-    var s = param('s');
-    return /^[0-9a-f]{8,64}$/i.test(s) ? s.toLowerCase() : '';
-  }
-  function putSeedInUrl(seed){
-    try { history.replaceState(null, '', baseUrl() + '#s=' + seed); }
-    catch (e) { location.hash = 's=' + seed; }
-  }
-  /* 参与者链接：只带组号和号码，不带种子 */
-  function groupLink(g, n){
-    return baseUrl() + '#g=' + g + '&v=' + n;
-  }
-
   function toast(msg){
     toastEl.textContent = msg;
     toastEl.classList.add('on');
     clearTimeout(toast._t);
     toast._t = setTimeout(function(){ toastEl.classList.remove('on'); }, 1800);
   }
-  function copy(text, okMsg){
-    function fallback(){
-      var ta = document.createElement('textarea');
-      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); toast(okMsg); }
-      catch (e) { toast('复制失败，请手动选中地址栏'); }
-      document.body.removeChild(ta);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){ toast(okMsg); }, fallback);
-    } else fallback();
-  }
+  function drawnGroups(){ return Object.keys(st.res).map(Number).sort(function(a, b){ return a - b; }); }
+  function isDone(){ return drawnGroups().length === GROUPS; }
 
-  /* ---------- 参与者视角 ---------- */
-  function showViewer(){
-    var g = parseInt(param('g'), 10);
-    var v = parseInt(param('v'), 10);
-    viewerEl.classList.remove('hidden');
-    if (!(g >= 1 && g <= GROUPS) || !(v >= 1 && v <= GROUPS)){
-      vnumEl.classList.add('hidden');
-      vwhoEl.classList.add('hidden');
-      vbadEl.classList.remove('hidden');
+  /* ---------- 转盘 ---------- */
+  function polar(cx, cy, r, deg){
+    var a = deg * Math.PI / 180;
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  }
+  function drawWheel(){
+    var nums = st.pool.slice().sort(function(a, b){ return a - b; });
+    var cx = 130, cy = 130, r = 118;
+    sectorsEl.innerHTML = '';
+
+    if (!nums.length){
+      var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r);
+      c.setAttribute('fill', '#dfe3e4');
+      sectorsEl.appendChild(c);
       return;
     }
-    vnumEl.innerHTML = v + '<small>号</small>';
-    vwhoEl.textContent = '第 ' + g + ' 组';
+    var step = 360 / nums.length;
+    nums.forEach(function(n, i){
+      // 第 i 个扇形的圆心角在正上方（指针处）加上 i 个步长
+      var start = -90 - step / 2 + i * step;
+      var end = start + step;
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      if (nums.length === 1){
+        path.setAttribute('d', 'M ' + cx + ' ' + cy + ' m -' + r + ' 0 a ' + r + ' ' + r + ' 0 1 0 ' + (2*r) + ' 0 a ' + r + ' ' + r + ' 0 1 0 -' + (2*r) + ' 0');
+      } else {
+        var p1 = polar(cx, cy, r, start), p2 = polar(cx, cy, r, end);
+        var large = (end - start) > 180 ? 1 : 0;
+        path.setAttribute('d', 'M ' + cx + ' ' + cy + ' L ' + p1.x.toFixed(2) + ' ' + p1.y.toFixed(2) +
+          ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + p2.x.toFixed(2) + ' ' + p2.y.toFixed(2) + ' Z');
+      }
+      path.setAttribute('fill', COLORS[i % COLORS.length]);
+      path.setAttribute('stroke', 'rgba(255,255,255,.85)');
+      path.setAttribute('stroke-width', '2');
+      sectorsEl.appendChild(path);
+
+      var mid = polar(cx, cy, r * 0.62, -90 + i * step);
+      var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', mid.x.toFixed(2));
+      t.setAttribute('y', mid.y.toFixed(2));
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('dy', '0.35em');
+      t.textContent = n;
+      sectorsEl.appendChild(t);
+    });
   }
 
-  /* ---------- 组织者视角 ---------- */
-  function showAdmin(seed){
-    var map = buildMap(seed);
-    adminEl.classList.remove('hidden');
-    rowsEl.innerHTML = '';
-    for (var g = 1; g <= GROUPS; g++){
-      (function(g){
-        var row = document.createElement('div');
-        row.className = 'row';
-        var lab = document.createElement('span');
-        lab.className = 'lab'; lab.textContent = '第 ' + g + ' 组';
-        var val = document.createElement('span');
-        val.className = 'val'; val.textContent = map[g] + ' 号';
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>第 ' + g + ' 组链接';
-        btn.addEventListener('click', function(){ copy(groupLink(g, map[g]), '第 ' + g + ' 组链接已复制'); });
-        row.appendChild(lab); row.appendChild(val); row.appendChild(btn);
-        rowsEl.appendChild(row);
-      })(g);
-    }
+  /* 转到指定扇形：让该扇形正对上方指针 */
+  function spinTo(index, total, done){
+    var step = 360 / total;
+    var targetMod = (360 - index * step) % 360;
+    var jitter = (randIndex(1000) / 1000 - 0.5) * step * 0.62;   // 落点在扇形内随机偏移
+    var finalDeg = 360 * 5 + targetMod + jitter;
+
+    wheelEl.style.transition = 'none';
+    wheelEl.style.transform = 'rotate(0deg)';
+    void wheelEl.offsetWidth;                                     // 强制重排，保证动画从 0 开始
+    var dur = SPIN_MS;
+    try {
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) dur = 600;
+    } catch (e) {}
+    wheelEl.style.transition = 'transform ' + dur + 'ms cubic-bezier(.16,.72,.16,1)';
+    wheelEl.style.transform = 'rotate(' + finalDeg + 'deg)';
+    setTimeout(done, dur + 60);
   }
 
-  /* ---------- 入口 ---------- */
-  function route(){
-    viewerEl.classList.add('hidden');
-    adminEl.classList.add('hidden');
-    rowsEl.innerHTML = '';
-    vbadEl.classList.add('hidden');
-    vnumEl.classList.remove('hidden');
-    vwhoEl.classList.remove('hidden');
-
-    var seed = seedFromUrl();
-    if (seed){
-      showAdmin(seed);                     // 网址里带 #s= ：只有组织者能看到对照表
-    } else if (param('g') || param('v')){
-      showViewer();                        // 网址里带 #g=&v= ：参与者只看到自己那一组
+  /* ---------- 渲染 ---------- */
+  function renderLists(){
+    poolEl.innerHTML = '';
+    var left = st.pool.slice().sort(function(a, b){ return a - b; });
+    if (!left.length){
+      var e = document.createElement('span');
+      e.className = 'empty'; e.textContent = '号码已经全部抽走';
+      poolEl.appendChild(e);
     } else {
-      var fresh = makeSeed();
-      putSeedInUrl(fresh);
-      showAdmin(fresh);                    // 裸网址：开一场新抽签，并生成四条链接
+      left.forEach(function(n){
+        var s = document.createElement('span'); s.className = 'pill'; s.textContent = n + ' 号';
+        poolEl.appendChild(s);
+      });
+    }
+    poolCount.textContent = '还剩 ' + left.length + ' 个';
+
+    drawnEl.innerHTML = '';
+    var ds = drawnGroups();
+    if (!ds.length){
+      var e2 = document.createElement('span');
+      e2.className = 'empty'; e2.textContent = '还没有人抽';
+      drawnEl.appendChild(e2);
+    } else {
+      ds.forEach(function(g){
+        var s = document.createElement('span'); s.className = 'pill'; s.textContent = '第 ' + g + ' 组';
+        drawnEl.appendChild(s);
+      });
+    }
+    drawnCount.textContent = ds.length + ' / ' + GROUPS;
+
+    if (isDone()){
+      finalBody.innerHTML = '';
+      for (var g = 1; g <= GROUPS; g++){
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td'); td1.textContent = '第 ' + g + ' 组';
+        var td2 = document.createElement('td'); td2.className = 'n'; td2.textContent = st.res[g] + ' 号';
+        tr.appendChild(td1); tr.appendChild(td2);
+        finalBody.appendChild(tr);
+      }
+      finalPanel.classList.remove('hidden');
+    } else {
+      finalPanel.classList.add('hidden');
     }
   }
 
-  window.addEventListener('hashchange', route);
-  route();
+  function showResult(g, n){
+    idleEl.classList.add('hidden');
+    shownEl.classList.remove('hidden');
+    numEl.innerHTML = n + '<small>号</small>';
+    whoEl.textContent = '第 ' + g + ' 组';
+    clearTimeout(resultTimer);
+    resultTimer = setTimeout(clearResult, 9000);   // 手机递给下一个人时不该看到上一个人的号码
+  }
+  function clearResult(){
+    clearTimeout(resultTimer);
+    shownEl.classList.add('hidden');
+    idleEl.classList.remove('hidden');
+    idleEl.textContent = '输入你是第几组，然后开始转';
+  }
+
+  /* ---------- 抽签 ---------- */
+  function submit(){
+    if (spinning) return;
+    var g = parseInt(gEl.value, 10);
+    if (!g || g < 1 || g > GROUPS){ toast('请输入 1 到 ' + GROUPS + ' 之间的组号'); gEl.focus(); return; }
+    if (st.res[g] !== undefined){ clearResult(); toast('第 ' + g + ' 组已经抽过了'); return; }
+    if (!st.pool.length){ toast('号码已经全部抽走了'); return; }
+
+    var idx = randIndex(st.pool.length);
+    var n = st.pool[idx];
+    spinning = true;
+    clearResult();
+    idleEl.textContent = '转盘转动中…';
+    goEl.disabled = true;
+    gEl.disabled = true;
+    drawWheel();                       // 转之前把盘面切成"当前还剩下的号码"
+
+    spinTo(idx, st.pool.length, function(){
+      st.pool.splice(idx, 1);
+      st.res[g] = n;
+      save();
+      spinning = false;
+      goEl.disabled = false;
+      gEl.disabled = false;
+      gEl.value = '';
+      showResult(g, n);
+      renderLists();                   // 盘面先留着，让大家看到指针停在哪
+      if (isDone()) toast('四组都抽完了，顺序已公布');
+    });
+  }
+
+  goEl.addEventListener('click', submit);
+  gEl.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); submit(); } });
+  resetEl.addEventListener('click', function(){
+    if (spinning) { toast('转盘还在转'); return; }
+    if (!window.confirm('确定要清空记录、重新抽签吗？')) return;
+    st = blank();
+    save();
+    clearResult();
+    renderLists();
+    drawWheel();
+    toast('已重新开始');
+  });
+
+  renderLists();
+  drawWheel();
 })();
 </script>
 </body>
